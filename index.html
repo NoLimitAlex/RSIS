@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ressu Student Investment Society</title>
+<meta name="description" content="Ressu Student Investment Society. A student-led investment society at Ressu upper secondary school, Helsinki.">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #0a3a2a;
+    --green-deep: #06261b;
+    --white: #f3f1ea;
+    --dim: rgba(243, 241, 234, .55);
+    --faint: rgba(243, 241, 234, .16);
+    --signal: #6fe0ae;
+    --serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --pad: clamp(18px, 3vw, 40px);
+    --pl: max(var(--pad), env(safe-area-inset-left, 0px));
+    --pr: max(var(--pad), env(safe-area-inset-right, 0px));
+    --pt: calc(var(--pad) + env(safe-area-inset-top, 0px));
+    --pb: calc(var(--pad) + env(safe-area-inset-bottom, 0px));
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--green); color: var(--white); font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; overflow-x: hidden; overflow-y: auto; -webkit-font-smoothing: antialiased; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  button { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+  /* Scroll cue */
+  .cue { position: absolute; left: 50%; bottom: var(--pb); transform: translateX(-50%); display: grid; justify-items: center; gap: 10px; color: var(--dim); font-size: 10px; transition: opacity .4s; }
+  .cue i { width: 1px; height: 34px; background: linear-gradient(var(--white), transparent); transform-origin: top; animation: drop 2.2s ease-in-out infinite; }
+  .cue.off { opacity: 0; }
+  @keyframes drop { 0% { transform: scaleY(0); } 55% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
+
+  /* Crest */
+  main { position: relative; height: 100%; display: grid; place-items: center; }
+  .crest { width: min(78vw, 560px); text-align: center; }
+  .crest svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .leaf { fill: var(--white); opacity: 0; animation: in .5s ease forwards; }
+  .stem { fill: none; stroke: var(--white); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 700; stroke-dashoffset: 700; animation: draw 1.3s ease forwards; }
+  .word { font-family: var(--serif); font-weight: 600; font-size: 118px; fill: var(--white); letter-spacing: -1px; opacity: 0; animation: in .9s .5s ease forwards; }
+  .full { margin: 22px 0 0; font-size: clamp(9px, 1.5vw, 12px); letter-spacing: .34em; opacity: 0; animation: in .9s 1.1s ease forwards; padding-left: .34em; }
+  @keyframes in { to { opacity: 1; } }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  /* Cursor readout */
+  #read { position: fixed; left: 0; top: 0; color: var(--dim); font-size: 10px; pointer-events: none; opacity: 0; transition: opacity .2s; white-space: nowrap; }
+
+  /* About */
+  .about { position: relative; min-height: 100%; background: var(--green-deep); display: grid; align-items: center; padding-block: calc(var(--pad) * 2.4) calc(var(--pb) + var(--pad)); padding-left: var(--pl); padding-right: var(--pr); }
+  .about-in { width: min(100%, 980px); margin: 0 auto; }
+  .row { display: grid; grid-template-columns: 150px 1fr; gap: 24px; padding: clamp(22px, 4vh, 40px) 0; border-top: 1px solid var(--faint); }
+  .row:last-of-type { border-bottom: 1px solid var(--faint); }
+  .row .k { color: var(--dim); padding-top: .9em; }
+  .row p { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(22px, 3.3vw, 40px); line-height: 1.18; letter-spacing: -.012em; text-transform: none; text-wrap: balance; }
+  .row p em { font-style: normal; color: var(--signal); }
+  .fine { margin: 22px 0 0; color: var(--dim); font-size: 10px; line-height: 1.7; }
+
+  /* Footer */
+  footer { position: relative; background: var(--green-deep); border-top: 1px solid var(--faint); padding-block: 18px calc(18px + env(safe-area-inset-bottom, 0px)); padding-left: var(--pl); padding-right: var(--pr); color: var(--dim); font-size: 10px; }
+  .foot-in { width: min(100%, 980px); margin: 0 auto; display: grid; gap: 14px; }
+  .foot-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; color: var(--white); }
+  .legal { margin: 0; text-transform: none; letter-spacing: .01em; line-height: 1.65; font-size: 9.5px; text-align: justify; hyphens: auto; }
+  .foot-sub { color: var(--dim); }
+  .lnk { color: var(--white); border-bottom: 1px solid var(--dim); padding-bottom: 2px; }
+  .lnk:hover, .lnk:focus-visible { border-color: var(--white); outline: none; }
+  .legal b { font-weight: 500; color: var(--white); text-transform: uppercase; letter-spacing: .08em; }
+
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr; gap: 8px; }
+    .row .k { padding-top: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .leaf, .word, .full { animation-duration: .01s; animation-delay: 0s; }
+    .stem { animation-duration: .01s; }
+    .cue i { animation: none; }
+    .live::before { animation: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+
+<main>
+  <div class="crest">
+    <svg id="crest" viewBox="-300 -200 600 400" role="img" aria-label="RSIS crest">
+      <text class="word" x="0" y="42" text-anchor="middle">RSIS</text>
+    </svg>
+    <h1 class="full">Ressu Student Investment Society</h1>
+  </div>
+  <div class="cue" id="cue" aria-hidden="true">Scroll<i></i></div>
+</main>
+
+<div id="read"></div>
+
+<section class="about" id="about" aria-label="About RSIS">
+  <div class="about-in">
+    <div class="row">
+      <div class="k">01 / What</div>
+      <p>A student-led investment society at Ressu upper secondary school in Helsinki, inspired by the investment societies of universities such as <em>Bocconi</em> and <em>LSE</em>.</p>
+    </div>
+    <div class="row">
+      <div class="k">02 / Goal</div>
+      <p>To give students the resources, the knowledge and early, relevant experience in <em>quantitative finance</em>, <em>corporate finance and M&amp;A</em>, <em>equity research</em> and <em>financial markets</em>.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-in">
+    <div class="foot-top">
+      <span>Ressu Student Investment Society · Est. 2026 · Helsinki</span>
+      <span>© 2026 RSIS. All rights reserved.</span>
+    </div>
+    <div class="foot-top foot-sub">
+      <span>Educational purposes only. Not financial advice.</span>
+      <button class="lnk" id="legal-btn" aria-expanded="false" aria-controls="legal">Legal</button>
+    </div>
+    <p class="legal" id="legal" hidden><b>Disclaimer.</b> Ressu Student Investment Society (“RSIS”) is a student-run educational organisation. RSIS is not a financial institution, investment firm, broker or investment adviser, and is not authorised, licensed or supervised by the Finnish Financial Supervisory Authority or by any other regulatory authority. All materials, research, opinions and other information published or presented by RSIS or its members are provided solely for educational and informational purposes and do not constitute, and shall not be construed as, investment, financial, legal or tax advice, a recommendation, or an offer or solicitation to buy or sell any security or financial instrument. RSIS does not manage or invest real funds. No representation or warranty, express or implied, is made as to the accuracy or completeness of any such information, and RSIS and its members accept no liability for any loss arising from reliance upon it. Past performance, whether actual or simulated, is not indicative of future results. RSIS is an independent student organisation; the views expressed are those of its members alone and do not represent those of Ressun lukio.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  /* ---- Crest: laurel built from one leaf shape ---- */
+  var NS = 'http://www.w3.org/2000/svg', svg = document.getElementById('crest');
+  var RX = 250, RY = 150, LEAF = 'M0 0C9-12 9-32 0-46C-9-32-9-12 0 0Z';
+  function pt(deg) { var t = deg * Math.PI / 180; return { x: RX * Math.cos(t), y: RY * Math.sin(t), tx: -RX * Math.sin(t), ty: RY * Math.cos(t) }; }
+  function branch(mirror) {
+    var g = document.createElementNS(NS, 'g');
+    if (mirror) g.setAttribute('transform', 'scale(-1,1)');
+    var d = '';
+    for (var a = 82; a <= 214; a += 4) { var q = pt(a); d += (d ? 'L' : 'M') + q.x.toFixed(1) + ' ' + q.y.toFixed(1); }
+    var stem = document.createElementNS(NS, 'path'); stem.setAttribute('d', d); stem.setAttribute('class', 'stem'); g.appendChild(stem);
+    var N = 13;
+    for (var i = 0; i < N; i++) {
+      var p = pt(98 + i * 118 / (N - 1)), rot = Math.atan2(p.tx, -p.ty) * 180 / Math.PI, s = 1 - i * 0.032;
+      var leans = i === N - 1 ? [0] : [40, -40];
+      leans.forEach(function (lean) {
+        var l = document.createElementNS(NS, 'path');
+        l.setAttribute('d', LEAF); l.setAttribute('class', 'leaf');
+        l.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ') rotate(' + (rot + lean).toFixed(1) + ') scale(' + s.toFixed(3) + ')');
+        l.style.animationDelay = (0.25 + i * 0.06) + 's';
+        g.appendChild(l);
+      });
+    }
+    svg.insertBefore(g, svg.firstChild);
+  }
+  branch(false); branch(true);
+
+  /* ---- Scroll cue fades once the visitor scrolls ---- */
+  var cue = document.getElementById('cue'), scroller = document.body;
+  function onScroll() { cue.classList.toggle('off', (scroller.scrollTop || document.documentElement.scrollTop) > 40); }
+  scroller.addEventListener('scroll', onScroll, { passive: true }); addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---- Legal text opens in place ---- */
+  var lb = document.getElementById('legal-btn'), legal = document.getElementById('legal');
+  lb.onclick = function () {
+    var open = legal.hidden;
+    legal.hidden = !open; lb.setAttribute('aria-expanded', open); lb.textContent = open ? 'Close legal' : 'Legal';
+    if (open) legal.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  };
+
+  /* ---- Field: generative market lines. Abstract, not real data. ---- */
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d'), W, H, dpr;
+  var STEP = 7, SPEED = 26, series = [], offset = 0, last = 0;
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var mouse = { x: -1, y: -1, on: false }, read = document.getElementById('read');
+
+  function next(s) {
+    s.drift += (Math.random() - 0.5) * 0.003; s.drift *= 0.92;
+    s.v += (Math.random() - 0.5) * s.vol * 1.5 + s.drift + (s.base - s.v) * 0.018;
+    s.v = Math.max(0.06, Math.min(0.94, s.v));
+    return s.v;
+  }
+  function build() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var n = Math.ceil(W / STEP) + 3;
+    series = [
+      { base: 0.50, vol: 0.016, a: 0.95, w: 1.4, main: true },
+      { base: 0.24, vol: 0.010, a: 0.20, w: 1 },
+      { base: 0.38, vol: 0.013, a: 0.14, w: 1 },
+      { base: 0.66, vol: 0.011, a: 0.17, w: 1 },
+      { base: 0.80, vol: 0.009, a: 0.12, w: 1 }
+    ].map(function (s) { s.v = s.base; s.drift = 0; s.pts = []; for (var i = 0; i < n; i++) s.pts.push(next(s)); return s; });
+    if (still) draw();
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // grid
+    var G = Math.max(64, Math.round(W / 16));
+    ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(243,241,234,.045)'; ctx.beginPath();
+    for (var x = -(offset * 0.5 % G); x < W; x += G) { ctx.moveTo(Math.round(x) + .5, 0); ctx.lineTo(Math.round(x) + .5, H); }
+    for (var y = G / 2; y < H; y += G) { ctx.moveTo(0, Math.round(y) + .5); ctx.lineTo(W, Math.round(y) + .5); }
+    ctx.stroke();
+    // lines
+    var headY = 0;
+    series.forEach(function (s) {
+      ctx.beginPath();
+      for (var i = 0; i < s.pts.length; i++) { var px = i * STEP - offset, py = s.pts[i] * H; if (i) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
+      ctx.strokeStyle = s.main ? 'rgba(111,224,174,' + s.a + ')' : 'rgba(243,241,234,' + s.a + ')';
+      ctx.lineWidth = s.w; ctx.stroke();
+      if (s.main) {
+        ctx.lineTo(W + 10, H); ctx.lineTo(-10, H); ctx.closePath();
+        var g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgba(111,224,174,.10)'); g.addColorStop(1, 'rgba(111,224,174,0)');
+        ctx.fillStyle = g; ctx.fill();
+        var k = Math.min(s.pts.length - 1, Math.floor((W + offset) / STEP)); headY = s.pts[k] * H;
+      }
+    });
+    // keep the crest readable
+    var r = Math.min(W, H) * 0.62, v = ctx.createRadialGradient(W / 2, H / 2, r * 0.25, W / 2, H / 2, r);
+    v.addColorStop(0, 'rgba(10,58,42,.94)'); v.addColorStop(1, 'rgba(10,58,42,0)');
+    ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+    // level marker for the main line
+    ctx.setLineDash([2, 6]); ctx.strokeStyle = 'rgba(111,224,174,.5)'; ctx.beginPath(); ctx.moveTo(W * 0.72, headY + .5); ctx.lineTo(W, headY + .5); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#6fe0ae'; ctx.beginPath(); ctx.arc(W - 1, headY, 3, 0, 7); ctx.fill();
+    // crosshair
+    if (mouse.on) {
+      ctx.strokeStyle = 'rgba(243,241,234,.22)'; ctx.beginPath();
+      ctx.moveTo(mouse.x + .5, 0); ctx.lineTo(mouse.x + .5, H); ctx.moveTo(0, mouse.y + .5); ctx.lineTo(W, mouse.y + .5); ctx.stroke();
+    }
+  }
+  function frame(t) {
+    var dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
+    offset += SPEED * dt;
+    while (offset >= STEP) { offset -= STEP; series.forEach(function (s) { s.pts.shift(); s.pts.push(next(s)); }); }
+    draw(); requestAnimationFrame(frame);
+  }
+  addEventListener('resize', build);
+  if (matchMedia('(hover: hover)').matches) {
+    addEventListener('mousemove', function (e) {
+      var inHero = (scroller.scrollTop || document.documentElement.scrollTop) < H * 0.5;
+      mouse.x = e.clientX; mouse.y = e.clientY; mouse.on = inHero;
+      read.style.opacity = inHero ? 1 : 0;
+      var flipX = e.clientX > W - 170, flipY = e.clientY > H - 40;
+      read.style.transform = 'translate(' + (e.clientX + (flipX ? -150 : 12)) + 'px,' + (e.clientY + (flipY ? -22 : 12)) + 'px)';
+      read.textContent = 'X ' + (e.clientX / W).toFixed(3) + '  Y ' + (1 - e.clientY / H).toFixed(3);
+      if (still) draw();
+    });
+    document.addEventListener('mouseleave', function () { mouse.on = false; read.style.opacity = 0; if (still) draw(); });
+  }
+  build();
+  if (!still) requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
